@@ -3,8 +3,13 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from utils.database import execute_query
+from utils.auth import get_current_user
 
 st.header("Manage Classes")
+
+# Get current user
+current_user = get_current_user()
+teacher_id = current_user['id']
 
 # Create new class
 st.subheader("Create New Class")
@@ -14,7 +19,7 @@ with st.form("new_class"):
     
     if submitted and class_name:
         try:
-            execute_query("INSERT INTO classes (name) VALUES (?)", (class_name,))
+            execute_query("INSERT INTO classes (name, teacher_id) VALUES (?, ?)", (class_name, teacher_id))
             st.success(f"Class '{class_name}' created successfully!")
         except Exception as e:
             st.error(f"Error creating class: {str(e)}")
@@ -22,8 +27,8 @@ with st.form("new_class"):
 # Add students to existing class
 st.subheader("Add Students to Class")
 
-# Get existing classes
-classes = execute_query("SELECT name FROM classes ORDER BY name")
+# Get existing classes for this teacher
+classes = execute_query("SELECT name FROM classes WHERE teacher_id = ? ORDER BY name", (teacher_id,))
 if classes:
     class_options = [cls[0] for cls in classes]
     
@@ -42,8 +47,8 @@ if classes:
             for name in names:
                 try:
                     execute_query(
-                        "INSERT INTO students (name, class_name) VALUES (?, ?)",
-                        (name, selected_class)
+                        "INSERT INTO students (name, class_name, teacher_id) VALUES (?, ?, ?)",
+                        (name, selected_class, teacher_id)
                     )
                     added_count += 1
                 except Exception as e:
@@ -57,13 +62,13 @@ else:
 # Display existing classes and students
 st.subheader("Current Classes and Students")
 
-classes = execute_query("SELECT name FROM classes ORDER BY name")
+classes = execute_query("SELECT name FROM classes WHERE teacher_id = ? ORDER BY name", (teacher_id,))
 if classes:
     for class_row in classes:
         class_name = class_row[0]
         students = execute_query(
-            "SELECT name FROM students WHERE class_name = ? ORDER BY name", 
-            (class_name,)
+            "SELECT name FROM students WHERE class_name = ? AND teacher_id = ? ORDER BY name", 
+            (class_name, teacher_id)
         )
         
         with st.expander(f"📚 {class_name} ({len(students)} students)"):

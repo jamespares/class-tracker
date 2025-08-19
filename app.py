@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.database import init_database
+from utils.auth import is_logged_in, show_login_page, show_user_info, is_admin, is_founder, is_james
 
 st.set_page_config(
     page_title="Class Tracker",
@@ -36,24 +37,40 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 # Initialize database on app start
 init_database()
 
+# Check authentication
+if not is_logged_in():
+    show_login_page()
+    st.stop()
+
 st.title("📚 Class Tracker")
 st.sidebar.title("Navigation")
 
+# Show user info in sidebar
+show_user_info()
+
 # Navigation menu
-page = st.sidebar.selectbox(
-    "Choose a page:",
-    [
-        "Home",
-        "Manage Classes",
-        "Homework Tracker", 
-        "Student Comments",
-        "Dictation Scores",
-        "Essay Marking",
-        "Spelling Tests",
-        "Grammar Errors",
-        "My Todo List"
-    ]
-)
+# Build navigation menu based on user role
+nav_options = [
+    "Home",
+    "Manage Classes",
+    "Homework Tracker", 
+    "Student Comments",
+    "Dictation Scores",
+    "Essay Marking",
+    "Spelling Tests",
+    "Grammar Errors",
+    "My Todo List"
+]
+
+# Add admin panel for James only
+if is_james():
+    nav_options.append("Admin Panel")
+
+# Add database viewer for James only
+if is_james():
+    nav_options.append("🗄️ Database Viewer")
+
+page = st.sidebar.selectbox("Choose a page:", nav_options)
 
 if page == "Home":
     st.header("Welcome to Class Tracker")
@@ -125,4 +142,18 @@ elif page == "My Todo List":
         exec(open('pages/todo.py').read())
     except Exception as e:
         st.error(f"Error loading My Todo List page: {str(e)}")
+        st.write("Please check the console for detailed error information.")
+
+elif page == "Admin Panel":
+    try:
+        exec(open('pages/admin_panel.py').read())
+    except Exception as e:
+        st.error(f"Error loading Admin Panel page: {str(e)}")
+        st.write("Please check the console for detailed error information.")
+
+elif page == "🗄️ Database Viewer":
+    try:
+        exec(open('pages/database_viewer.py').read())
+    except Exception as e:
+        st.error(f"Error loading Database Viewer page: {str(e)}")
         st.write("Please check the console for detailed error information.")

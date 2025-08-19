@@ -11,22 +11,67 @@ def init_database():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
     
-    # Students table
+    # Users/Teachers table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            full_name TEXT NOT NULL,
+            role TEXT CHECK(role IN ('teacher', 'admin')) DEFAULT 'teacher',
+            is_active BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    
+    # Create founding team accounts only
+    import hashlib
+    
+    # Founding team accounts with random passwords
+    
+    # James - Founder (password: rx9K2p)
+    james_password = hashlib.sha256("rx9K2p".encode()).hexdigest()
+    cursor.execute('''
+        INSERT OR IGNORE INTO users (username, password_hash, full_name, role) 
+        VALUES ('james', ?, 'James Pares', 'admin')
+    ''', (james_password,))
+    
+    # Joe - Founder (password: mL7Ht3)  
+    joe_password = hashlib.sha256("mL7Ht3".encode()).hexdigest()
+    cursor.execute('''
+        INSERT OR IGNORE INTO users (username, password_hash, full_name, role) 
+        VALUES ('joe', ?, 'Joe (Founder)', 'admin')
+    ''', (joe_password,))
+    
+    # Jake - Founder (password: qN4Xv8)
+    jake_password = hashlib.sha256("qN4Xv8".encode()).hexdigest()
+    cursor.execute('''
+        INSERT OR IGNORE INTO users (username, password_hash, full_name, role) 
+        VALUES ('jake', ?, 'Jake (Founder)', 'admin')
+    ''', (jake_password,))
+    
+
+    # Students table (now linked to teachers)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS students (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT NOT NULL,
             class_name TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            teacher_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (teacher_id) REFERENCES users (id)
         )
     ''')
     
-    # Classes table
+    # Classes table (now linked to teachers)
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS classes (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT UNIQUE NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            name TEXT NOT NULL,
+            teacher_id INTEGER NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (teacher_id) REFERENCES users (id),
+            UNIQUE(name, teacher_id)
         )
     ''')
     
@@ -136,6 +181,25 @@ def init_database():
             FOREIGN KEY (student_id) REFERENCES students (id)
         )
     ''')
+    
+    # Migrate existing database to add teacher_id columns if they don't exist
+    try:
+        # Check if classes table has teacher_id column
+        cursor.execute("PRAGMA table_info(classes)")
+        classes_columns = [col[1] for col in cursor.fetchall()]
+        if 'teacher_id' not in classes_columns:
+            cursor.execute("ALTER TABLE classes ADD COLUMN teacher_id INTEGER DEFAULT 1")
+            cursor.execute("UPDATE classes SET teacher_id = 1 WHERE teacher_id IS NULL")
+        
+        # Check if students table has teacher_id column
+        cursor.execute("PRAGMA table_info(students)")
+        students_columns = [col[1] for col in cursor.fetchall()]
+        if 'teacher_id' not in students_columns:
+            cursor.execute("ALTER TABLE students ADD COLUMN teacher_id INTEGER DEFAULT 1")
+            cursor.execute("UPDATE students SET teacher_id = 1 WHERE teacher_id IS NULL")
+            
+    except Exception as e:
+        print(f"Migration warning: {e}")
     
     conn.commit()
     conn.close()
