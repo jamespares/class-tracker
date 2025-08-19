@@ -1,0 +1,5 @@
+streamlit==1.39.0
+pandas==2.2.2
+plotly==5.22.0
+pydub==0.25.1
+openai
