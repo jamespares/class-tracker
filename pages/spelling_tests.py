@@ -107,7 +107,7 @@ if spelling_data:
         title='Weekly Class Average Spelling Scores',
         markers=True
     )
-    fig_weekly.update_yaxis(range=[0, 100])
+    fig_weekly.update_yaxes(range=[0, 100])
     st.plotly_chart(fig_weekly, use_container_width=True)
     
     # Individual student progress
@@ -137,7 +137,7 @@ if spelling_data:
             title=f'{selected_student} - Spelling Test Progress',
             markers=True
         )
-        fig_student.update_yaxis(range=[0, 100])
+        fig_student.update_yaxes(range=[0, 100])
         st.plotly_chart(fig_student, use_container_width=True)
         
         # Recent scores table
@@ -184,8 +184,8 @@ if spelling_data:
         y='Percentage',
         title='Term Average Spelling Scores by Student'
     )
-    fig_averages.update_xaxis(tickangle=45)
-    fig_averages.update_yaxis(range=[0, 100])
+    fig_averages.update_xaxes(tickangle=45)
+    fig_averages.update_yaxes(range=[0, 100])
     st.plotly_chart(fig_averages, use_container_width=True)
     
     # Raw data table

@@ -91,7 +91,7 @@ if grammar_data:
         title='Most Common Grammar Errors in Class',
         labels={'x': 'Error Type', 'y': 'Number of Occurrences'}
     )
-    fig_errors.update_xaxis(tickangle=45)
+    fig_errors.update_xaxes(tickangle=45)
     st.plotly_chart(fig_errors, use_container_width=True)
     
     # Student-specific analysis
@@ -169,7 +169,7 @@ if grammar_data:
             color='Error Type',
             title='Grammar Error Trends Over Time'
         )
-        fig_trends.update_xaxis(tickangle=45)
+        fig_trends.update_xaxes(tickangle=45)
         st.plotly_chart(fig_trends, use_container_width=True)
     
     # Heat map of student vs error type
@@ -185,7 +185,7 @@ if grammar_data:
             labels=dict(x="Error Type", y="Student", color="Count"),
             aspect="auto"
         )
-        fig_heatmap.update_xaxis(tickangle=45)
+        fig_heatmap.update_xaxes(tickangle=45)
         st.plotly_chart(fig_heatmap, use_container_width=True)
     
     # Summary statistics
