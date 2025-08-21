@@ -7,3 +7,6 @@ gatherUsageStats = false
 
 [theme]
 base = "light"
+
+# Force redeployment - all Plotly methods fixed
+# Updated: 2025-01-27
