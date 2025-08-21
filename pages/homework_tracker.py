@@ -111,7 +111,9 @@ if homework_history:
     
     # Style the dataframe
     def color_status(val):
-        if val == 'on_time':
+        if pd.isna(val):
+            return ''
+        elif val == 'on_time':
             return 'background-color: lightgreen'
         elif val == 'late':
             return 'background-color: lightcoral'
@@ -119,7 +121,7 @@ if homework_history:
             return 'background-color: lightgray'
         return ''
     
-    styled_df = pivot_df.style.applymap(color_status, na_rep='')
+    styled_df = pivot_df.style.applymap(color_status)
     st.dataframe(styled_df, use_container_width=True)
     
     # Summary statistics
