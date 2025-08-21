@@ -94,12 +94,6 @@ def show_login_page():
     """Display login form"""
     st.title("🔐 Class Tracker Login")
     
-    # Demo credentials info box
-    st.info("🧪 **Demo Account Available!**\n\n"
-           "**Username:** demo\n\n"
-           "**Password:** demo\n\n"
-           "Try the demo to explore all features with sample data!")
-    
     with st.form("login_form"):
         st.subheader("Please log in to continue")
         username = st.text_input("Username")
