@@ -88,6 +88,30 @@ if page == "Home":
     Use the sidebar to navigate between features.
     """)
     
+    # Demo data section
+    from utils.auth import get_current_user
+    from utils.database import insert_demo_data
+    
+    user = get_current_user()
+    if user and user.get('username') == 'demo':
+        st.markdown("---")
+        st.subheader("🧪 Demo Data")
+        st.write("Welcome to the demo! Click the button below to populate the app with sample data to explore all features.")
+        
+        col1, col2 = st.columns([1, 3])
+        with col1:
+            if st.button("🗂️ Insert Test Data", type="primary"):
+                with st.spinner("Inserting demo data..."):
+                    success, message = insert_demo_data()
+                    if success:
+                        st.success(f"✅ {message}")
+                        st.info("🔄 Please refresh the page or navigate to different sections to see the demo data!")
+                    else:
+                        st.error(f"❌ {message}")
+        
+        with col2:
+            st.info("💡 **Tip**: This will create sample students, classes, homework records, comments, and test scores for you to explore!")
+    
 elif page == "Manage Classes":
     try:
         exec(open('pages/add_class.py').read())
