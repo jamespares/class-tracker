@@ -2,8 +2,13 @@ import streamlit as st
 import sys
 import os
 from datetime import datetime
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.database import execute_query
+
+# Import from parent directory
+try:
+    from utils.database import execute_query
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils.database import execute_query
 
 st.header("My Todo List")
 

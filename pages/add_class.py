@@ -1,9 +1,15 @@
 import streamlit as st
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.database import execute_query
-from utils.auth import get_current_user
+
+# Import from parent directory
+try:
+    from utils.database import execute_query
+    from utils.auth import get_current_user
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils.database import execute_query
+    from utils.auth import get_current_user
 
 st.header("Manage Classes")
 

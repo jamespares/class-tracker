@@ -3,9 +3,15 @@ import sys
 import os
 import pandas as pd
 from datetime import datetime
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.database import execute_query
-from utils.auth import is_james, create_user, hash_password
+
+# Import from parent directory
+try:
+    from utils.database import execute_query
+    from utils.auth import is_james, create_user, hash_password
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils.database import execute_query
+    from utils.auth import is_james, create_user, hash_password
 
 # SECURITY: Only James can access admin panel
 if not is_james():

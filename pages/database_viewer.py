@@ -3,9 +3,15 @@ import sys
 import os
 import pandas as pd
 import sqlite3
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from utils.database import execute_query, get_connection
-from utils.auth import is_james
+
+# Import from parent directory
+try:
+    from utils.database import execute_query, get_connection
+    from utils.auth import is_james
+except ImportError:
+    sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    from utils.database import execute_query, get_connection
+    from utils.auth import is_james
 
 # SECURITY: Only James can access this page
 if not is_james():
