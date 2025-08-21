@@ -314,17 +314,22 @@ if essay_history:
             if essay_details:
                 feedback_en, feedback_zh, criteria_breakdown = essay_details[0]
                 
-                if criteria_breakdown:
-                    breakdown = json.loads(criteria_breakdown)
-                    col1, col2, col3, col4 = st.columns(4)
-                    with col1:
-                        st.write(f"Content: {breakdown['content_ideas']}/25")
-                    with col2:
-                        st.write(f"Organization: {breakdown['organization']}/25")
-                    with col3:
-                        st.write(f"Language: {breakdown['language_use']}/25")
-                    with col4:
-                        st.write(f"Conventions: {breakdown['conventions']}/25")
+                if criteria_breakdown and criteria_breakdown.strip():
+                    try:
+                        breakdown = json.loads(criteria_breakdown)
+                        col1, col2, col3, col4 = st.columns(4)
+                        with col1:
+                            st.write(f"Content: {breakdown.get('content_ideas', 'N/A')}/25")
+                        with col2:
+                            st.write(f"Organization: {breakdown.get('organization', 'N/A')}/25")
+                        with col3:
+                            st.write(f"Language: {breakdown.get('language_use', 'N/A')}/25")
+                        with col4:
+                            st.write(f"Conventions: {breakdown.get('conventions', 'N/A')}/25")
+                    except (json.JSONDecodeError, TypeError) as e:
+                        st.warning("Unable to display detailed breakdown for this essay.")
+                else:
+                    st.info("No detailed breakdown available for this essay.")
                 
                 # Copy-pastable feedback tabs
                 tab1, tab2 = st.tabs(["English Feedback", "Chinese Feedback"])
