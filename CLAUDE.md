@@ -70,3 +70,4 @@ Database path: `database/school.db`
 - Grammar errors are categorized using predefined types for Chinese ESL learners
 - Student performance data is aggregated for term-end reporting
 - Database initialization occurs automatically on app startup
+- **CRITICAL**: The database now contains live user data - NEVER delete existing data or modify database schemas without explicit user permission

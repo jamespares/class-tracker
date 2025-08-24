@@ -203,6 +203,52 @@ with st.form("new_dictation_task"):
         )
         st.success(f"Dictation task '{task_name}' created successfully!")
 
+# Delete dictation task
+st.subheader("Delete Dictation Task")
+tasks_for_deletion = execute_query("SELECT id, name FROM dictation_tasks ORDER BY created_at DESC")
+if tasks_for_deletion:
+    task_delete_options = {f"{name}": task_id for task_id, name in tasks_for_deletion}
+    
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        task_to_delete = st.selectbox("Select Task to Delete", list(task_delete_options.keys()), key="delete_task_select")
+    with col2:
+        if st.button("🗑️ Delete Task", type="secondary"):
+            if task_to_delete:
+                task_id = task_delete_options[task_to_delete]
+                
+                # Check if task has any scores recorded
+                existing_scores = execute_query(
+                    "SELECT COUNT(*) FROM dictation_scores WHERE task_id = ?", 
+                    (task_id,)
+                )
+                score_count = existing_scores[0][0] if existing_scores else 0
+                
+                if score_count > 0:
+                    st.error(f"Cannot delete '{task_to_delete}' - it has {score_count} student scores recorded.")
+                else:
+                    # Get audio file path before deletion
+                    audio_info = execute_query(
+                        "SELECT audio_file FROM dictation_tasks WHERE id = ?", 
+                        (task_id,)
+                    )
+                    audio_file_path = audio_info[0][0] if audio_info and audio_info[0][0] else None
+                    
+                    # Delete the task
+                    execute_query("DELETE FROM dictation_tasks WHERE id = ?", (task_id,))
+                    
+                    # Delete audio file if exists
+                    if audio_file_path and os.path.exists(audio_file_path):
+                        try:
+                            os.remove(audio_file_path)
+                        except OSError:
+                            pass  # Continue even if audio file deletion fails
+                    
+                    st.success(f"Dictation task '{task_to_delete}' deleted successfully!")
+                    st.rerun()
+else:
+    st.info("No dictation tasks available to delete.")
+
 # Score dictation attempts
 st.subheader("Score Student Attempts")
 
